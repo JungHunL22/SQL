@@ -29,7 +29,7 @@ from instacart.order_products__prior
 group by 1) A) A
 where RNK <=10;
 
-# department별 재구매율 상위 10개
+# department,product_id별 재구매율 상위 10개
 select * 
 from
 (select *,
