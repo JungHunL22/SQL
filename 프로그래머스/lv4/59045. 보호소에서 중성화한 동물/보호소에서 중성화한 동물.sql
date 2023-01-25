@@ -1,0 +1,2 @@
+-- 코드를 입력하세요
+SELECT A.animal_id,A.animal_type,A.name from animal_ins A left join animal_outs B on A.animal_id=B.animal_id where sex_upon_intake like '%intact%' and (sex_upon_outcome like '%neutered%'  or sex_upon_outcome like '%spayed%') order by 1
