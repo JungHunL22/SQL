@@ -1,0 +1,2 @@
+-- 코드를 입력하세요
+SELECT A.product_id,product_name,sum(amount*price) total_sales from food_product A inner join food_order B on A.product_id=B.product_id where substr(produce_date,1,7)='2022-05' group by 1 order by 3 desc,1
