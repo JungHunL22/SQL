@@ -25,9 +25,3 @@ count(distinct case when is_new_user=1 then user_id end) as new_usr_cnt,
 count(distinct case when is_new_user=0 then user_id end) as repeat_usr_cnt,
 count(*) as sess_cnt
 from temp1;
-
-
-
-/************************************
-채널별로 MAU를 신규 사용자, 기존 사용자로 나누고, 채널별 비율까지 함께 계산. 
-*************************************/
