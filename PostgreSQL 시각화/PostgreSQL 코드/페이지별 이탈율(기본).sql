@@ -5,7 +5,16 @@
 --select sess_id,hit_seq,page_path
 --from ga.ga_sess_hits
 --group by 1;
-
+select a.page_path, b.sess_id, hit_seq, hit_type, action_type
+	-- 세션별 페이지 건수를 구함. 
+	, count(*) over (partition by b.sess_id rows between unbounded preceding and unbounded following) as sess_cnt
+	, count(*) over (partition by b.sess_id) as sess_cnt_02
+	-- 세션별 첫페이지를 구해서 추후에 현재 페이지와 세션별 첫페이지가 같은지 비교하기 위한 용도. 
+	, first_value(page_path) over (partition by b.sess_id order by hit_seq) as first_page_path
+from ga.ga_sess_hits a
+	join ga.ga_sess b on a.sess_id = b.sess_id 
+where visit_stime >= (:current_date - interval '30 days') and visit_stime < :current_date
+and a.hit_type = 'PAGE'
 
 /************************************
 과거 30일간 페이지별 이탈율(bounce rate)
@@ -36,7 +45,8 @@ select page_path, count(*) as page_cnt
 group by page_path
 )
 select *
-	-- 이탈율 계산. sess_cnt_01이 0 일 경우 0으로 나눌수 없으므로 Null값 처리. sess_cnt_01이 0이면 bounce session이 없으므로 이탈율은 0임. 
+	-- 이탈율 계산. sess_cnt_01이 0 일 경우 0으로 나눌수 없으므로 Null값 처리. sess_cnt_01이 0이면 bounce session이 없으므로 이탈율은 0임.
+	-- coalesce를 이용해 null인 경우 0으로 출력하도록 함. 
 	, coalesce(round(100.0 * bounce_cnt_per_page / (case when sess_cnt_per_page_01 = 0 then null else sess_cnt_per_page_01 end), 2), 0) as bounce_pct_01
 	, round(100.0 * bounce_cnt_per_page / sess_cnt_per_page_02, 2) as bounce_pct_02
 from temp_02
